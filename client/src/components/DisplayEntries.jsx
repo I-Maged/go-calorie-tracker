@@ -1,7 +1,99 @@
-import Entry from './Entry';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Button, Form, Container, Modal } from 'react-bootstrap';
+import Entry from './Entry';
 
 const DisplayEntries = () => {
+  const [entries, setEntries] = useState([]);
+  const [refreshData, setRefreshData] = useState(false);
+  const [changeEntry, setChangeEntry] = useState({ change: false, id: 0 });
+  const [changeIngredient, setChangeIngredient] = useState({
+    change: false,
+    id: 0,
+  });
+  const [newIngredientName, setNewIngredientName] = useState('');
+  const [addNewEntry, setAddNewEntry] = useState(false);
+  const [newEntry, setNewEntry] = useState({
+    dish: '',
+    ingredients: '',
+    calories: 0,
+    fat: 0,
+  });
+
+  useEffect(() => {
+    getAllEntries();
+  }, []);
+
+  if (refreshData) {
+    setRefreshData(false);
+    getAllEntries();
+  }
+
+  const addSingleEntry = () => {
+    setAddNewEntry(false);
+    const url = 'http://localhost:8080/entry/create';
+    axios
+      .post(url, {
+        ingredients: newEntry.ingredients,
+        dish: newEntry.dish,
+        calories: newEntry.calories,
+        fat: parseFloat(newEntry.fat),
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          setRefreshData(true);
+        }
+      });
+  };
+
+  const getAllEntries = () => {
+    const url = 'http://localhost:8080/entries';
+    axios
+      .get(url, {
+        reponseType: 'json',
+      })
+      .then((response) => {
+        if (response.status == 200) {
+          setEntries(response.data);
+        }
+      });
+  };
+
+  const changeSingleEntry = () => {
+    changeEntry.change = false;
+    const url = 'http://localhost:8080/entry/update/' + changeEntry.id;
+    axios.put(url, newEntry).then((response) => {
+      if (response.status == 200) {
+        setRefreshData(true);
+      }
+    });
+  };
+
+  const changeIngredientForEntry = () => {
+    changeIngredient.change = false;
+    const url =
+      'http://localhost:8080/ingredient/update/' + changeIngredient.id;
+    axios
+      .put(url, {
+        ingredients: newIngredientName,
+      })
+      .then((response) => {
+        console.log(response.status);
+        if (response.status == 200) {
+          setRefreshData(true);
+        }
+      });
+  };
+
+  const deleteSingleEntry = (id) => {
+    const url = 'http://localhost:8080/entry/delete/' + id;
+    axios.delete(url, {}).then((response) => {
+      if (response.status == 200) {
+        setRefreshData(true);
+      }
+    });
+  };
+
   return (
     <div>
       <Container>
