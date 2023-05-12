@@ -20,15 +20,6 @@ const DisplayEntries = () => {
     fat: 0,
   });
 
-  useEffect(() => {
-    getAllEntries();
-  }, []);
-
-  if (refreshData) {
-    setRefreshData(false);
-    getAllEntries();
-  }
-
   const addSingleEntry = () => {
     setAddNewEntry(false);
     const url = 'http://localhost:8080/entry/create';
@@ -40,7 +31,7 @@ const DisplayEntries = () => {
         fat: parseFloat(newEntry.fat),
       })
       .then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           setRefreshData(true);
         }
       });
@@ -53,7 +44,7 @@ const DisplayEntries = () => {
         reponseType: 'json',
       })
       .then((response) => {
-        if (response.status == 200) {
+        if (response.status === 200) {
           setEntries(response.data);
         }
       });
@@ -63,7 +54,7 @@ const DisplayEntries = () => {
     changeEntry.change = false;
     const url = 'http://localhost:8080/entry/update/' + changeEntry.id;
     axios.put(url, newEntry).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setRefreshData(true);
       }
     });
@@ -79,7 +70,7 @@ const DisplayEntries = () => {
       })
       .then((response) => {
         console.log(response.status);
-        if (response.status == 200) {
+        if (response.status === 200) {
           setRefreshData(true);
         }
       });
@@ -88,11 +79,20 @@ const DisplayEntries = () => {
   const deleteSingleEntry = (id) => {
     const url = 'http://localhost:8080/entry/delete/' + id;
     axios.delete(url, {}).then((response) => {
-      if (response.status == 200) {
+      if (response.status === 200) {
         setRefreshData(true);
       }
     });
   };
+
+  useEffect(() => {
+    getAllEntries();
+  }, []);
+
+  if (refreshData) {
+    setRefreshData(false);
+    getAllEntries();
+  }
 
   return (
     <div>
@@ -113,7 +113,7 @@ const DisplayEntries = () => {
           ))}
       </Container>
 
-      <Modal show={addNewEntry} onHide={() => setAddNewEntry(false)} centred>
+      <Modal show={addNewEntry} onHide={() => setAddNewEntry(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Add Calorie Entry</Modal.Title>
         </Modal.Header>
@@ -154,7 +154,6 @@ const DisplayEntries = () => {
       <Modal
         show={changeIngredient.change}
         onHide={() => setChangeIngredient({ change: false, id: 0 })}
-        centred
       >
         <Modal.Header closeButton>
           <Modal.Title>Change Ingredients</Modal.Title>
@@ -179,7 +178,6 @@ const DisplayEntries = () => {
       <Modal
         show={changeEntry.change}
         onHide={() => setChangeEntry({ change: false, id: 0 })}
-        centred
       >
         <Modal.Header closeButton>
           <Modal.Title>Change Entry</Modal.Title>
